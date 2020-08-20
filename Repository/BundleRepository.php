@@ -4,9 +4,32 @@ namespace SwagMigrationBundleApiExample\Repository;
 
 use Doctrine\DBAL\Connection;
 use SwagMigrationConnector\Repository\AbstractRepository;
+use SwagMigrationConnector\Util\TotalStruct;
 
 class BundleRepository extends AbstractRepository
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function requiredForCount(array $entities)
+    {
+        return !in_array('swag_bundle', $entities);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTotal()
+    {
+        $total = (int) $this->connection->createQueryBuilder()
+            ->select('COUNT(*)')
+            ->from('s_bundles')
+            ->execute()
+            ->fetchColumn();
+
+        return new TotalStruct('swag_bundle', $total);
+    }
+
     /**
      * Fetch bundles using offset and limit
      *
